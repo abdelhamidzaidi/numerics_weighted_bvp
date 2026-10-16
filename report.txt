@@ -1,0 +1,130 @@
+numerics_weighted_bvp.py 1.1.0  |  Python 3.13.16, NumPy 2.5.4, SciPy 1.18.1, mpmath 1.4.1
+run started 2026-10-15 16:59:46 UTC on Linux-6.18.44-fc-v114-x86_64-with-glibc2.39  |  mode: full  |  items: table1 table2 table3 table4 figure1 figure2 figure3 figure4 figure5 checks
+
+==============================================================================
+TABLE 1  Uniqueness thresholds for the power weight (L = 1)
+==============================================================================
+gamma                          1.05        1.1       1.25        1.5       1.75          2
+j_{1/gamma,1}               3.76739    3.70870    3.55978    3.37561    3.24244    3.14159
+Lyapunov-type [AAJ17]       1.22264    1.39808    1.86919    2.59808    3.30385    4.00000
+Sup-norm 1/V1               2.92526    3.13843    3.81470    5.06250    6.45843    8.00000
+HS 1/sqrt(H1)               3.27742    3.55978    4.43706    6.00000    7.68521    9.48683
+Weighted HS 1/sqrt(T2)      3.69853    3.93995    4.70621    6.12372    7.71717    9.48683
+Sharp lambda_1              3.91202    4.16073    4.95001    6.40955    8.04936    9.86960
+Upper bound T2/T3           4.25375    4.51500    5.34375    6.87500    8.59375   10.50000
+
+Remark 4.9: ratio lambda_1 / Lyapunov-type bound
+  gamma=1.05: 3.20  gamma=1.1: 2.98  gamma=1.25: 2.65  gamma=1.5: 2.47  gamma=1.75: 2.44  gamma=2: 2.47
+  minimum on (1,2]: 2.4359 at gamma = 1.719;  limit gamma->1+: j_{1,1}^2/4 = 3.6705
+  check Table 1, lambda_1 at gamma=1.25              computed 4.950014261        reference 4.95001        OK
+        |diff| = 4.3e-06  (relative 8.6e-07)  <=  tol 6e-06 (absolute)
+  check Table 1, 1/sqrt(T2) at gamma=1.25            computed 4.706212649        reference 4.70621        OK
+        |diff| = 2.6e-06  (relative 5.6e-07)  <=  tol 6e-06 (absolute)
+  check Remark 4.9, minimum ratio                    computed 2.435879066        reference 2.436          OK
+        |diff| = 1.2e-04  (relative 5.0e-05)  <=  tol 6e-04 (absolute)
+
+==============================================================================
+TABLE 2  Uniqueness thresholds for the sequential problem (b - a = 1)
+==============================================================================
+delta                           0.3        0.4        0.5       0.75          1
+Banach-type 8 delta^2       0.72000    1.28000    2.00000    4.50000    8.00000
+Hilbert-Schmidt H2^-1/2     0.53666    1.31453    2.23607    5.30330    9.48683
+Sharp delta^2 pi^2          0.88826    1.57914    2.46740    5.55165    9.86960
+Proposition 5.7(b): delta* = (sqrt(65)-5)/8 = 0.382782
+  check Table 2, H2^-1/2 at delta=0.4                computed 1.314534138        reference 1.31453        OK
+        |diff| = 4.1e-06  (relative 3.1e-06)  <=  tol 6e-06 (absolute)
+
+==============================================================================
+TABLE 3  lambda_1: Bessel formula versus Nystrom discretization
+==============================================================================
+gamma  Theorem 4.2          Nystrom N=1600    rel.err    extrapol. 
+1.10   4.160726360087355    4.160704471347    5.3e-06    1.0e-13   
+1.25   4.950014260841104    4.950008178117    1.2e-06    9.0e-16   
+1.50   6.409545344200491    6.409541936398    5.3e-07    1.2e-15   
+1.75   8.049358949872041    8.049355904536    3.8e-07    2.7e-13   
+2.00   9.869604401089359    9.869601230221    3.2e-07    1.8e-16   
+  check Table 3, Nystrom N=1600 at gamma=1.25        computed 4.950008178        reference 4.950008178    OK
+        |diff| = 8.9e-16  (relative 1.8e-16)  <=  tol 1e-11 (absolute)
+
+==============================================================================
+TABLE 4  Successive approximations where only the sharp condition applies
+==============================================================================
+order           K   Banach       HS    sharp    K/sharp       rate   lin.   sin
+gamma=1.25   4.80   3.8147   4.4371   4.9500   0.969694   0.969695    891    19
+gamma=1.50   6.20   5.0625   6.0000   6.4095   0.967307   0.967308    824    18
+gamma=1.75   7.90   6.4584   7.6852   8.0494   0.981445   0.981445   1463    17
+delta=0.40   1.50   1.2800   1.3145   1.5791   0.949886   0.949886    546    --
+delta=0.60   3.45   2.8800   3.3299   3.5531   0.970995   0.970995    941    --
+(the observed rate differs from K/lambda_1 by the O(N^-2) error of Table 3)
+
+==============================================================================
+FIGURE 1  Admissibility regions, conformable problem (13)
+==============================================================================
+  -> plotted coordinates written to results/figure1_coordinates.txt
+  Example 6.1 point (5/4, 4.8): sharp 4.9500, weighted HS 4.7062, HS 4.4371
+
+==============================================================================
+FIGURE 2  Admissibility regions, sequential problem (15)
+==============================================================================
+  -> plotted coordinates written to results/figure2_coordinates.txt
+
+==============================================================================
+FIGURE 3 / EXAMPLES 6.1 and 6.2
+==============================================================================
+Example 6.1: 30 iterations (N=1600); mesh doubling changes u by 4.86e-07
+  max u = 1.7161, u(1/2) = 1.7017
+  shooting: 1 root(s) p=u'(0+) in [-20,20]: 6.747463; max u = 1.7161, u(1/2) = 1.7017
+  check Example 6.1, max u                           computed 1.71612751         reference 1.7161         OK
+        |diff| = 2.8e-05  (relative 1.6e-05)  <=  tol 6e-05 (absolute)
+Example 6.2: 18 iterations (N=1600 in tau on [0,5/3])
+  max u = 1.9906, u(1/2) = 1.9621
+  check Example 6.2, max u                           computed 1.990559035        reference 1.9906         OK
+        |diff| = 4.1e-05  (relative 2.1e-05)  <=  tol 6e-05 (absolute)
+  -> plotted coordinates written to results/figure3_coordinates.txt
+
+==============================================================================
+FIGURE 4 / PROPOSITION 7.1  Gain factors
+==============================================================================
+Proposition 7.1: R_B(1+) = j11^2/(4e) = 1.35030, R_HS(1+) = j11^2/12 = 1.22350
+                 R_B(2) = pi^2/8 = 1.23370, R_HS(2) = pi^2/sqrt(90) = 1.04035
+400-point grid: R_B decreasing: True, R_HS decreasing: True
+gain vs Banach 23.4%-35.0%, vs HS 4.0%-22.3%
+  -> plotted coordinates written to results/figure4_coordinates.txt
+
+==============================================================================
+FIGURE 5 / SECTION 7.4  Bifurcation at K = lambda_1
+==============================================================================
+C_gamma: C_1.25 = 8.3622, C_1.5 = 8.1866, C_1.75 = 8.0735, C_2.0 = 8.0000
+scan (1500 shooting parameters per case); entries: number of positive solutions
+  gamma=1.25  0.90:0 0.99:0 1.01:1 1.05:1 1.20:1 1.50:1 2.00:1   amplitude at 1.01: 0.2882 (prediction 0.2892)
+  gamma=1.50  0.90:0 0.99:0 1.01:1 1.05:1 1.20:1 1.50:1 2.00:1   amplitude at 1.01: 0.2851 (prediction 0.2861)
+  gamma=1.75  0.90:0 0.99:0 1.01:1 1.05:1 1.20:1 1.50:1 2.00:1   amplitude at 1.01: 0.2831 (prediction 0.2841)
+  gamma = 3/2: sup-norm and HS certify uniqueness only for K/lambda_1 < 0.790 and 0.936
+  check Figure 5, amplitude at K/lambda_1 = 2        computed 2.196401153        reference 2.1964         OK
+        |diff| = 1.2e-06  (relative 5.2e-07)  <=  tol 6e-05 (absolute)
+  -> plotted coordinates written to results/figure5_coordinates.txt
+
+==============================================================================
+CHECKS  Closed forms of Propositions 4.4, 5.6 and Corollary 4.6
+==============================================================================
+  check Prop. 4.4  H1(gamma=1.25)                    computed 0.05079365079      reference 0.05079365079  OK
+        |diff| = 7.2e-12  (relative 1.4e-10)  <=  tol 1e-07 (absolute)
+  check Cor. 4.6  T2(gamma=1.25)                     computed 0.04514991179      reference 0.04514991182  OK
+        |diff| = 2.3e-11  (relative 5.1e-10)  <=  tol 1e-07 (absolute)
+  check Cor. 4.6  T3(gamma=1.25) via trace(M^3)      computed 0.008449139823     reference 0.008449106305 OK
+        |diff| = 3.4e-08  (relative 4.0e-06)  <=  tol 1e-07 (absolute)
+  check Prop. 4.4  H1(gamma=1.75)                    computed 0.01693121693      reference 0.01693121693  OK
+        |diff| = 3.3e-12  (relative 2.0e-10)  <=  tol 1e-07 (absolute)
+  check Cor. 4.6  T2(gamma=1.75)                     computed 0.01679128951      reference 0.01679128952  OK
+        |diff| = 6.9e-12  (relative 4.1e-10)  <=  tol 1e-07 (absolute)
+  check Cor. 4.6  T3(gamma=1.75) via trace(M^3)      computed 0.00195389787      reference 0.001953895508 OK
+        |diff| = 2.4e-09  (relative 1.2e-06)  <=  tol 1e-07 (absolute)
+  check Prop. 5.6  H2(delta=0.6)                     computed 0.09018759019      reference 0.09018759019  OK
+        |diff| = 1.4e-13  (relative 1.5e-12)  <=  tol 1e-07 (absolute)
+
+==============================================================================
+SUMMARY
+==============================================================================
+checks: 15 run, 15 OK, 0 MISMATCH
+time per item: table1 0.2 s, table2 0.0 s, table3 2.5 s, table4 2.2 s, figure1 0.2 s, figure2 0.0 s, figure3 0.8 s, figure4 2.1 s, figure5 345.5 s, checks 0.5 s
+Total time: 354.1 s
