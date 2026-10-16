@@ -12,15 +12,35 @@ Supplementary code (Code S1) for the manuscript
 The script regenerates every number, table and plotted curve of the paper.
 Appendix B of the paper ("Reproducibility of Results") lists which function
 produces which table or figure; the same list is printed by `--list`.
+Every table value and every plotted curve is recomputed from scratch on each
+run; no stored data are read.
+
+Version 1.1.0 (revised manuscript, October 2026).  Equation numbers below
+refer to the revised manuscript: problem (1) the weighted problem, (13) the
+conformable problem of order gamma, (15) the sequential problem, (19)-(20)
+Examples 6.1-6.2, (22) the sine problem and (23) the amplitude prediction.
 
 Requirements
 ------------
     Python >= 3.9, NumPy, SciPy, mpmath          (nothing else)
+    Tested with Python 3.12, NumPy 2.x, SciPy 1.1x, mpmath 1.3 (see README.md).
+
+Numerical checks
+----------------
+    Each "check" line compares a recomputed value with the value printed in the
+    paper and reports OK when |computed - reference| <= tol, an ABSOLUTE
+    tolerance chosen per check: half a unit in the last printed digit for
+    values printed to a fixed number of decimals, and a larger, stated
+    tolerance for quantities obtained by quadrature or discretization (for
+    example trace(M^3) of the N = 1600 Nystrom matrix, whose O(N^-2) error is
+    about 3e-8).  The line also shows the absolute and relative differences.
+    An OK line is therefore a check within a stated tolerance, not an exact
+    identity.
 
 Usage
 -----
-    python numerics_weighted_bvp.py            # everything (about 5-10 min)
-    python numerics_weighted_bvp.py --quick    # coarser shooting scans (~1-2 min)
+    python numerics_weighted_bvp.py            # everything (6-7 min on the test machine)
+    python numerics_weighted_bvp.py --quick    # coarser shooting scans for Figure 5 only
     python numerics_weighted_bvp.py --only table3 figure5
     python numerics_weighted_bvp.py --list     # item -> function map
 
@@ -54,6 +74,8 @@ from scipy.optimize import brentq, minimize_scalar
 mp.mp.dps = 30                      # working precision for Bessel zeros
 OUT = "results"                     # output folder
 REPORT = []                         # lines of the text report
+CHECKS = []                         # outcomes of all check() calls
+__version__ = "1.1.0"
 
 
 # ---------------------------------------------------------------------------
@@ -88,10 +110,20 @@ def write_coordinates(name, curves):
 
 
 def check(label, computed, reference, tol):
-    """Compare a computed value with the value printed in the paper."""
-    ok = abs(computed - reference) <= tol
+    """Compare a computed value with the value printed in the paper.
+
+    OK means |computed - reference| <= tol, with tol an absolute tolerance
+    (see "Numerical checks" in the module docstring).  The absolute and
+    relative differences are printed so that the margin is visible."""
+    diff = abs(computed - reference)
+    ok = diff <= tol
+    rel = diff / abs(reference) if reference else float("nan")
     say("  check %-44s computed %-18.10g reference %-14.10g %s"
         % (label, computed, reference, "OK" if ok else "MISMATCH"))
+    say("        |diff| = %.1e  (relative %.1e)  <=  tol %.0e (absolute)"
+        % (diff, rel, tol) if ok else
+        "        |diff| = %.1e  (relative %.1e)  >  tol %.0e (absolute)" % (diff, rel, tol))
+    CHECKS.append(ok)
     return ok
 
 
@@ -298,7 +330,7 @@ def table1_power_weight_thresholds():
 
 
 def table2_sequential_thresholds():
-    """Table 2: thresholds of the sequential problem (12), b - a = 1
+    """Table 2: thresholds of the sequential problem (15), b - a = 1
     (Theorem 5.5, Propositions 5.6 and 5.7)."""
     header("TABLE 2  Uniqueness thresholds for the sequential problem (b - a = 1)")
     deltas = ["0.3", "0.4", "0.5", "0.75", "1"]
@@ -360,7 +392,7 @@ def table4_contraction(N=1600):
 def figure1_regions_cf():
     """Figure 1: threshold curves K = 1/V1, 1/sqrt(H1), lambda_1 over gamma
     (b - a = 1).  The same curves fill panels (a) and (b)."""
-    header("FIGURE 1  Admissibility regions, conformable problem (10)")
+    header("FIGURE 1  Admissibility regions, conformable problem (13)")
     gs = [1.0005, 1.002, 1.005, 1.01] + [round(1.02 + 0.01 * k, 4) for k in range(99)]
     sharp = [float(lambda1_power(mp.mpf(str(g)))) for g in gs]
     hs = [float(1 / mp.sqrt(H1(g))) for g in gs]
@@ -380,7 +412,7 @@ def figure1_regions_cf():
 
 def figure2_regions_scf():
     """Figure 2: threshold curves 8 delta^2, H2^-1/2, delta^2 pi^2 over delta."""
-    header("FIGURE 2  Admissibility regions, sequential problem (12)")
+    header("FIGURE 2  Admissibility regions, sequential problem (15)")
     ds = [round(0.01 * k, 4) for k in range(101)]
     dh = [0.25, 0.2525, 0.255] + [round(0.26 + 0.01 * k, 4) for k in range(75)]
     write_coordinates("figure2", [
@@ -395,7 +427,7 @@ def figure2_regions_scf():
 
 
 def figure3_examples(N=1600):
-    """Figure 3 and Examples 6.1-6.2: unique solutions of (16) and (17),
+    """Figure 3 and Examples 6.1-6.2: unique solutions of (19) and (20),
     by successive approximations, with mesh doubling and an independent
     shooting check."""
     header("FIGURE 3 / EXAMPLES 6.1 and 6.2")
@@ -466,7 +498,7 @@ def figure4_gain_factors():
 
 
 def C_gamma(gamma):
-    """Coefficient of the amplitude prediction (20), phi_1 normalized by max = 1."""
+    """Coefficient of the amplitude prediction (23), phi_1 normalized by max = 1."""
     g = mp.mpf(gamma)
     nu, j = 1 / g, bessel_zero(1 / g)
     phi = lambda t: mp.sqrt(t) * mp.besselj(nu, j * t ** (g / 2))
@@ -517,7 +549,7 @@ def figure5_bifurcation(quick=False):
     write_coordinates("figure5", [
         ("shooting branch, gamma = 3/2", "coordinates {(1.0,0) " +
          pgf(rs, amps, fy="{:.5f}")[len("coordinates {"):]),
-        ("prediction (20): sqrt(C_1.5 (x-1)) with C_1.5", "C_1.5 = %.6f" % C[1.5]),
+        ("prediction (23): sqrt(C_1.5 (x-1)) with C_1.5", "C_1.5 = %.6f" % C[1.5]),
     ])
 
 
@@ -537,7 +569,7 @@ def checks_closed_forms():
         check("Cor. 4.6  T2(gamma=%.2f)" % g, t2, float(T2(g)), 1e-7)
         _, _, M = nystrom_power(g, 1600)
         check("Cor. 4.6  T3(gamma=%.2f) via trace(M^3)" % g, float(np.trace(M @ M @ M)),
-              float(T3(g)), 1e-5)
+              float(T3(g)), 1e-7)   # O(N^-2) Nystrom error, about 3e-8 at N = 1600
     d = 0.6
     G2 = lambda t, s: (s ** (2 * d - 1) * (1 - t**d) if s <= t
                        else t**d * s ** (d - 1) * (1 - s**d)) / d
@@ -574,13 +606,26 @@ def main():
             print("%-8s %-28s %s()" % (key, what, fn.__name__))
         return
     os.makedirs(OUT, exist_ok=True)
-    say("numerics_weighted_bvp.py  |  Python %s, NumPy %s, mpmath %s"
-        % (sys.version.split()[0], np.__version__, mp.__version__))
+    import platform
+    import scipy
+    say("numerics_weighted_bvp.py %s  |  Python %s, NumPy %s, SciPy %s, mpmath %s"
+        % (__version__, sys.version.split()[0], np.__version__, scipy.__version__,
+           mp.__version__))
+    say("run started %s UTC on %s  |  mode: %s  |  items: %s"
+        % (time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()), platform.platform(),
+           "quick" if args.quick else "full", " ".join(args.only or ITEMS)))
     t0 = time.time()
+    timings = []
     for key in (args.only or ITEMS):
         fn = ITEMS[key][0]
+        t1 = time.time()
         fn(quick=args.quick) if key == "figure5" else fn()
-    say("\nTotal time: %.1f s" % (time.time() - t0))
+        timings.append((key, time.time() - t1))
+    header("SUMMARY")
+    say("checks: %d run, %d OK, %d MISMATCH"
+        % (len(CHECKS), sum(CHECKS), len(CHECKS) - sum(CHECKS)))
+    say("time per item: " + ", ".join("%s %.1f s" % kt for kt in timings))
+    say("Total time: %.1f s" % (time.time() - t0))
     with open(os.path.join(OUT, "report.txt"), "w") as fh:
         fh.write("\n".join(REPORT) + "\n")
     print("Report written to", os.path.join(OUT, "report.txt"))
