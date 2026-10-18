@@ -1,4 +1,0 @@
-numpy>=1.22
-scipy>=1.8
-mpmath>=1.2
-matplotlib>=3.5   # only for figure1_admissibility_regions.py
