@@ -1,5 +1,5 @@
-numerics_weighted_bvp.py 1.1.0  |  Python 3.13.16, NumPy 2.5.4, SciPy 1.18.1, mpmath 1.4.1
-run started 2026-10-15 16:59:46 UTC on Linux-6.18.44-fc-v114-x86_64-with-glibc2.39  |  mode: full  |  items: table1 table2 table3 table4 figure1 figure2 figure3 figure4 figure5 checks
+numerics_weighted_bvp.py 1.2.0  |  Python 3.13.16, NumPy 2.5.4, SciPy 1.18.1, mpmath 1.4.1
+run started 2026-10-18 08:05:17 UTC on Linux-6.18.44-fc-v139-x86_64-with-glibc2.39  |  mode: full  |  items: table1 table2 table3 table4 figure1 figure2 figure3 figure4 figure5 checks
 
 ==============================================================================
 TABLE 1  Uniqueness thresholds for the power weight (L = 1)
@@ -22,6 +22,18 @@ Remark 4.9: ratio lambda_1 / Lyapunov-type bound
         |diff| = 2.6e-06  (relative 5.6e-07)  <=  tol 6e-06 (absolute)
   check Remark 4.9, minimum ratio                    computed 2.435879066        reference 2.436          OK
         |diff| = 1.2e-04  (relative 5.0e-05)  <=  tol 6e-04 (absolute)
+
+Remark 4.7: elementary bounds of Corollary 4.6 relative to lambda_1
+  lower bound below lambda_1 by 3.88% (gamma = 2) to 5.62% (limit gamma -> 1+); decreasing on a 400-point grid: True
+  upper bound above lambda_1 by 6.39% (gamma = 2) to 8.98% (limit gamma -> 1+); decreasing on a 400-point grid: True
+  share of the gap lambda_1 - 1/sqrt(H1) closed by 1/sqrt(T2):
+  gamma=1+: 69.2%  gamma=1.25: 52.5%  gamma=1.5: 30.2%  gamma=1.75: 8.8%  gamma=2: 0.0%
+  check Remark 4.7, lower-bound gap, gamma->1+ (%)   computed 5.622979379        reference 5.6            OK
+        |diff| = 2.3e-02  (relative 4.1e-03)  <=  tol 5e-02 (absolute)
+  check Remark 4.7, upper-bound gap, gamma->1+ (%)   computed 8.977196522        reference 9              OK
+        |diff| = 2.3e-02  (relative 2.5e-03)  <=  tol 5e-02 (absolute)
+  check Remark 4.7, share closed at gamma=1.25 (%)   computed 52.47109677        reference 52             OK
+        |diff| = 4.7e-01  (relative 9.1e-03)  <=  tol 5e-01 (absolute)
 
 ==============================================================================
 TABLE 2  Uniqueness thresholds for the sequential problem (b - a = 1)
@@ -125,6 +137,6 @@ CHECKS  Closed forms of Propositions 4.4, 5.6 and Corollary 4.6
 ==============================================================================
 SUMMARY
 ==============================================================================
-checks: 15 run, 15 OK, 0 MISMATCH
-time per item: table1 0.2 s, table2 0.0 s, table3 2.5 s, table4 2.2 s, figure1 0.2 s, figure2 0.0 s, figure3 0.8 s, figure4 2.1 s, figure5 345.5 s, checks 0.5 s
-Total time: 354.1 s
+checks: 18 run, 18 OK, 0 MISMATCH
+time per item: table1 2.1 s, table2 0.0 s, table3 3.9 s, table4 2.6 s, figure1 0.2 s, figure2 0.0 s, figure3 2.3 s, figure4 2.2 s, figure5 271.9 s, checks 0.9 s
+Total time: 286.2 s

@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Zaidi
+    given-names: Abdelhamid Taieb
+    orcid: "https://orcid.org/0000-0003-1305-4959"
+    affiliation: "Department of Mathematics, College of Science, Qassim University"
+title: "numerics_weighted_bvp: supplementary code for 'Optimal Lipschitz Thresholds for Weighted Dirichlet Problems, with an Explicit Bessel-Zero Bound for Power Weights'"
+version: "1.2.0"
+date-released: "2026-10-18"
+license: CC-BY-4.0
+repository-code: "https://github.com/abdelhamidzaidi/numerics_weighted_bvp"

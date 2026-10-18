@@ -15,7 +15,7 @@ produces which table or figure; the same list is printed by `--list`.
 Every table value and every plotted curve is recomputed from scratch on each
 run; no stored data are read.
 
-Version 1.1.0 (revised manuscript, October 2026).  Equation numbers below
+Version 1.2.0 (revised manuscript, October 2026).  Equation numbers below
 refer to the revised manuscript: problem (1) the weighted problem, (13) the
 conformable problem of order gamma, (15) the sequential problem, (19)-(20)
 Examples 6.1-6.2, (22) the sine problem and (23) the amplitude prediction.
@@ -75,7 +75,7 @@ mp.mp.dps = 30                      # working precision for Bessel zeros
 OUT = "results"                     # output folder
 REPORT = []                         # lines of the text report
 CHECKS = []                         # outcomes of all check() calls
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 
 # ---------------------------------------------------------------------------
@@ -302,7 +302,7 @@ def roots_in(f, grid):
 # ===========================================================================
 def table1_power_weight_thresholds():
     """Table 1: thresholds for w = t^(gamma-2), L = 1 (Theorems 4.2, 4.5,
-    Proposition 4.4, Corollary 4.6, Remark 4.9)."""
+    Proposition 4.4, Corollary 4.6, Remarks 4.7 and 4.9)."""
     header("TABLE 1  Uniqueness thresholds for the power weight (L = 1)")
     gammas = ["1.05", "1.1", "1.25", "1.5", "1.75", "2"]
     rows = [
@@ -327,6 +327,31 @@ def table1_power_weight_thresholds():
     check("Table 1, lambda_1 at gamma=1.25", float(lambda1_power("1.25")), 4.95001, 6e-6)
     check("Table 1, 1/sqrt(T2) at gamma=1.25", float(1 / mp.sqrt(T2("1.25"))), 4.70621, 6e-6)
     check("Remark 4.9, minimum ratio", float(ratio(gmin)), 2.436, 6e-4)
+    say("")
+    # Remark 4.7: how far the elementary bounds of Corollary 4.6 lie from
+    # lambda_1, and which part of the gap between the unweighted HS threshold
+    # 1/sqrt(H1) and lambda_1 is closed by the weighted HS threshold 1/sqrt(T2).
+    # All closed forms are continuous at gamma = 1, so the limits gamma -> 1+
+    # are obtained by evaluating them at gamma = 1.
+    say("Remark 4.7: elementary bounds of Corollary 4.6 relative to lambda_1")
+    low = lambda g: 100 * (1 - 1 / mp.sqrt(T2(g)) / lambda1_power(g))
+    upp = lambda g: 100 * (T2(g) / T3(g) / lambda1_power(g) - 1)
+    share = lambda g: (100 * (1 / mp.sqrt(T2(g)) - 1 / mp.sqrt(H1(g)))
+                       / (lambda1_power(g) - 1 / mp.sqrt(H1(g))))
+    grid = [1 + mp.mpf(k) / 400 for k in range(1, 401)]
+    lows, upps = [low(g) for g in grid], [upp(g) for g in grid]
+    dec = lambda v: all(x > y for x, y in zip(v, v[1:]))
+    say("  lower bound below lambda_1 by %.2f%% (gamma = 2) to %.2f%% (limit gamma -> 1+);"
+        " decreasing on a 400-point grid: %s" % (float(low(2)), float(low(1)), dec(lows)))
+    say("  upper bound above lambda_1 by %.2f%% (gamma = 2) to %.2f%% (limit gamma -> 1+);"
+        " decreasing on a 400-point grid: %s" % (float(upp(2)), float(upp(1)), dec(upps)))
+    say("  share of the gap lambda_1 - 1/sqrt(H1) closed by 1/sqrt(T2):")
+    say("  " + "  ".join("gamma=%s: %.1f%%" % (lab, float(share(g)))
+                         for lab, g in (("1+", 1), ("1.25", "1.25"), ("1.5", "1.5"),
+                                        ("1.75", "1.75"), ("2", 2))))
+    check("Remark 4.7, lower-bound gap, gamma->1+ (%)", float(low(1)), 5.6, 0.05)
+    check("Remark 4.7, upper-bound gap, gamma->1+ (%)", float(upp(1)), 9.0, 0.05)
+    check("Remark 4.7, share closed at gamma=1.25 (%)", float(share("1.25")), 52, 0.5)
 
 
 def table2_sequential_thresholds():
