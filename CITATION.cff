@@ -1,9 +1,0 @@
-cff-version: 1.1.1
-message: "If you use this software, please cite it as below."
-authors:
-- family-names: Zaidi
-  given-names: Abdelhamid Taieb
-orcid: https://orcid.org/0000-0003-1305-4959
-title:abdelhamidzaidi/numerics_weighted_bvp: v1.1.1
-version: v1.1.1
-date-released: 2026-10-16
