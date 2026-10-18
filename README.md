@@ -118,4 +118,4 @@ This section mirrors Appendix B of the paper. The **Key** column is the argument
 
 ## Versions
 
-See `CHANGELOG.md`. Version 1.0.1 (30 September 2026) accompanies the original submission and is archived at doi:10.5281/zenodo.23056907. Version 1.1.1 (16 October 2026) is archived at doi:10.5281/zenodo.23412862. Version 1.2.0 accompanies the second revision of the manuscript.
+See `CHANGELOG.md`. Version 1.0.1 (30 September 2026) accompanies the original submission and is archived at doi:10.5281/zenodo.23056907. Version 1.1.1 (16 October 2026) is archived at doi:10.5281/zenodo.23412862. Version 1.2.0 accompanies the second revision of the manuscript; release v1.2.1 is the complete archive of that version (the v1.2.0 release lacked two files, see `CHANGELOG.md`).
